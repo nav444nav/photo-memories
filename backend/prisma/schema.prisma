@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  avatarUrl    String?  @map("avatar_url")
+  storageUsed  BigInt   @default(0) @map("storage_used")
+  storageLimit BigInt   @default(5368709120) @map("storage_limit") // 5GB
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  photos Photo[]
+  albums Album[]
+  tags   Tag[]
+
+  @@map("users")
+}
+
+model Photo {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  filename     String
+  originalUrl  String   @map("original_url")
+  thumbnailUrl String   @map("thumbnail_url")
+  mediumUrl    String?  @map("medium_url")
+  fileSize     BigInt   @map("file_size")
+  width        Int?
+  height       Int?
+  format       String?
+  takenAt      DateTime? @map("taken_at")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+  isFavorite   Boolean  @default(false) @map("is_favorite")
+  isArchived   Boolean  @default(false) @map("is_archived")
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  albumPhotos AlbumPhoto[]
+  photoTags   PhotoTag[]
+
+  @@index([userId, uploadedAt(sort: Desc)])
+  @@index([userId, takenAt(sort: Desc)])
+  @@index([userId, isFavorite])
+  @@map("photos")
+}
+
+model Album {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  name           String
+  description    String?
+  coverPhotoId   String?  @map("cover_photo_id")
+  isShared       Boolean  @default(false) @map("is_shared")
+  shareToken     String?  @unique @map("share_token")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  albumPhotos AlbumPhoto[]
+
+  @@index([userId])
+  @@map("albums")
+}
+
+model AlbumPhoto {
+  albumId  String   @map("album_id")
+  photoId  String   @map("photo_id")
+  position Int      @default(0)
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@id([albumId, photoId])
+  @@index([albumId])
+  @@index([photoId])
+  @@map("album_photos")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  color     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoTags PhotoTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("tags")
+}
+
+model PhotoTag {
+  photoId   String   @map("photo_id")
+  tagId     String   @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([photoId, tagId])
+  @@index([photoId])
+  @@index([tagId])
+  @@map("photo_tags")
+}
