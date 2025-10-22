@@ -1,0 +1,49 @@
+# Render Blueprint for Photo Memories Backend
+# This file enables one-click deployment to Render
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: photo-memories-api
+    runtime: node
+    region: oregon  # Change to: oregon, frankfurt, singapore, ohio
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 10000
+
+      - key: DATABASE_URL
+        sync: false  # Must be set manually in Render dashboard
+
+      - key: JWT_SECRET
+        generateValue: true  # Auto-generates secure random value
+
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+      - key: FRONTEND_URL
+        sync: false  # Set to your Vercel URL after frontend deployment
+
+      - key: MAX_FILE_SIZE
+        value: 20971520
+
+      - key: MAX_FILES_PER_UPLOAD
+        value: 10
+
+      - key: DEFAULT_STORAGE_LIMIT
+        value: 5368709120
+
+# Optional: Add PostgreSQL database (not needed if using Supabase)
+# databases:
+#   - name: photo-memories-db
+#     databaseName: photo_memories
+#     plan: free
