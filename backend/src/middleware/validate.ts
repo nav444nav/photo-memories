@@ -12,7 +12,7 @@ export const validatePassword = (password: string): boolean => {
 
 export const validateRegister = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const { email, password, full_name } = req.body
@@ -46,7 +46,7 @@ export const validateRegister = (
 
 export const validateLogin = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const { email, password } = req.body

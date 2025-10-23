@@ -75,8 +75,8 @@ export const getPhoto = async (
 }
 
 export const uploadPhotos = async (
-  req: AuthRequest,
-  res: Response,
+  _req: AuthRequest,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
@@ -213,7 +213,6 @@ export const searchPhotos = async (
         userId: req.user.userId,
         filename: {
           contains: query,
-          mode: 'insensitive',
         },
       },
       orderBy: { uploadedAt: 'desc' },
@@ -234,8 +233,8 @@ export const searchPhotos = async (
 }
 
 export const addTags = async (
-  req: AuthRequest,
-  res: Response,
+  _req: AuthRequest,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
@@ -247,8 +246,8 @@ export const addTags = async (
 }
 
 export const removeTag = async (
-  req: AuthRequest,
-  res: Response,
+  _req: AuthRequest,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
