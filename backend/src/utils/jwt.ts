@@ -7,9 +7,9 @@ export const generateToken = (payload: JWTPayload): string => {
     throw new Error('JWT_SECRET is not defined')
   }
 
-  return jwt.sign(payload, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-  })
+  const expiresIn = process.env.JWT_EXPIRES_IN || '7d'
+
+  return jwt.sign(payload, secret, { expiresIn } as any)
 }
 
 export const verifyToken = (token: string): JWTPayload => {
