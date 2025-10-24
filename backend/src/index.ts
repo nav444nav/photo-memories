@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes'
 import photoRoutes from './routes/photo.routes'
 import albumRoutes from './routes/album.routes'
 import tagRoutes from './routes/tag.routes'
+import prisma from './utils/prisma'
 
 // Load environment variables
 dotenv.config()
@@ -25,6 +26,24 @@ app.use(express.urlencoded({ extended: true }))
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+// Database connection test
+app.get('/db-test', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1 as result`
+    res.json({
+      status: 'connected',
+      database: 'PostgreSQL',
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    })
+  }
 })
 
 // API Routes
