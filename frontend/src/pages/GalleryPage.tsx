@@ -1,18 +1,52 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { photoService } from '@/services/photo.service'
 import PhotoGrid from '@/components/gallery/PhotoGrid'
 import LoadingSkeleton from '@/components/gallery/LoadingSkeleton'
 import { Photo } from '@/types'
+import { useRef, useState } from 'react'
 
 export default function GalleryPage() {
+  const queryClient = useQueryClient()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadProgress, setUploadProgress] = useState<string>('')
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['photos'],
     queryFn: () => photoService.getPhotos({ page: 1, limit: 50 }),
   })
 
+  const uploadMutation = useMutation({
+    mutationFn: (files: File[]) => photoService.uploadPhotos(files),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos'] })
+      setUploadProgress('Upload successful!')
+      setTimeout(() => setUploadProgress(''), 3000)
+    },
+    onError: (error: any) => {
+      setUploadProgress(`Upload failed: ${error.message}`)
+      setTimeout(() => setUploadProgress(''), 5000)
+    },
+  })
+
   const handlePhotoClick = (photo: Photo) => {
     console.log('Photo clicked:', photo)
     // TODO: Open photo viewer/lightbox
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      setUploadProgress(`Uploading ${files.length} ${files.length === 1 ? 'photo' : 'photos'}...`)
+      // Convert FileList to File[]
+      const fileArray = Array.from(files)
+      uploadMutation.mutate(fileArray)
+      // Reset input
+      e.target.value = ''
+    }
   }
 
   return (
@@ -26,12 +60,29 @@ export default function GalleryPage() {
             </p>
           )}
         </div>
-        <button className="btn-primary">
-          <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Upload Photos
-        </button>
+        <div className="flex items-center gap-3">
+          {uploadProgress && (
+            <span className="text-sm text-gray-600">{uploadProgress}</span>
+          )}
+          <button
+            className="btn-primary"
+            onClick={handleUploadClick}
+            disabled={uploadMutation.isPending}
+          >
+            <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {uploadMutation.isPending ? 'Uploading...' : 'Upload Photos'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
       </div>
 
       {/* Error state */}
