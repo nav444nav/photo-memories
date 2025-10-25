@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import * as photoController from '../controllers/photo.controller'
 import { authenticate } from '../middleware/auth'
+import { upload } from '../middleware/upload'
 
 const router = Router()
 
@@ -19,8 +20,8 @@ router.get('/search', photoController.searchPhotos)
 // GET /api/photos/:id - Get single photo
 router.get('/:id', photoController.getPhoto)
 
-// POST /api/photos - Upload new photos
-router.post('/', photoController.uploadPhotos)
+// POST /api/photos - Upload new photos (accepts up to 10 files)
+router.post('/', upload.array('photos', 10), photoController.uploadPhotos)
 
 // PUT /api/photos/:id - Update photo metadata
 router.put('/:id', photoController.updatePhoto)

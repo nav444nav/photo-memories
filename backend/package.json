@@ -14,7 +14,12 @@
     "db:seed": "tsx src/prisma/seed.ts",
     "lint": "tsc --noEmit"
   },
-  "keywords": ["photo", "express", "typescript", "prisma"],
+  "keywords": [
+    "photo",
+    "express",
+    "typescript",
+    "prisma"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -26,6 +31,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.9.1",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
