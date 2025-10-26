@@ -126,18 +126,55 @@ export const handlers = [
   }),
 
   // POST /api/photos (upload)
-  http.post(`${API_URL}/photos`, async () => {
+  http.post(`${API_URL}/photos`, async ({ request }) => {
     await delay(1500) // Longer delay for uploads
 
-    // Create a new mock photo
-    const newPhoto = {
-      ...mockPhotos[0],
-      id: `photo-${Date.now()}`,
-      filename: 'new-upload.jpg',
-      uploaded_at: new Date().toISOString(),
-    }
+    try {
+      const formData = await request.formData()
+      const files = formData.getAll('photos') as File[]
 
-    return HttpResponse.json({ photos: [newPhoto] }, { status: 201 })
+      if (files.length === 0) {
+        return HttpResponse.json(
+          { error: { message: 'No files uploaded', code: 'BAD_REQUEST' } },
+          { status: 400 }
+        )
+      }
+
+      // Create photo objects from uploaded files
+      const newPhotos = files.map((file) => {
+        // Create object URL from the file for preview
+        const objectUrl = URL.createObjectURL(file)
+
+        return {
+          id: `photo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          userId: currentUser.id,
+          filename: file.name,
+          originalUrl: objectUrl,
+          thumbnailUrl: objectUrl,
+          mediumUrl: objectUrl,
+          fileSize: file.size,
+          width: 0, // Would need to read image to get actual dimensions
+          height: 0,
+          format: file.type.split('/')[1] || 'jpg',
+          takenAt: new Date().toISOString(),
+          uploadedAt: new Date().toISOString(),
+          isFavorite: false,
+          isArchived: false,
+          metadata: {},
+        }
+      })
+
+      // Add to mock photos array for persistence during session
+      mockPhotos.unshift(...newPhotos)
+
+      return HttpResponse.json({ photos: newPhotos, count: newPhotos.length }, { status: 201 })
+    } catch (error) {
+      console.error('Mock upload error:', error)
+      return HttpResponse.json(
+        { error: { message: 'Upload failed', code: 'UPLOAD_ERROR' } },
+        { status: 500 }
+      )
+    }
   }),
 
   // PUT /api/photos/:id
@@ -162,14 +199,30 @@ export const handlers = [
   http.delete(`${API_URL}/photos/:id`, async ({ params }) => {
     await delay(DELAY_MS)
     const { id } = params
-    const photo = mockPhotos.find(p => p.id === id)
+    const photoIndex = mockPhotos.findIndex(p => p.id === id)
 
-    if (!photo) {
+    if (photoIndex === -1) {
       return HttpResponse.json(
         { error: { message: 'Photo not found', code: 'NOT_FOUND' } },
         { status: 404 }
       )
     }
+
+    const photo = mockPhotos[photoIndex]
+
+    // Clean up object URLs to prevent memory leaks
+    if (photo.originalUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(photo.originalUrl)
+    }
+    if (photo.thumbnailUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(photo.thumbnailUrl)
+    }
+    if (photo.mediumUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(photo.mediumUrl)
+    }
+
+    // Remove from mock photos array
+    mockPhotos.splice(photoIndex, 1)
 
     return new HttpResponse(null, { status: 204 })
   }),
