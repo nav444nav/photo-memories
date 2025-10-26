@@ -77,8 +77,8 @@ Build a feature-rich, scalable photo management platform using free/low-cost tec
 ┌──────────────────────────┐  ┌──────────────────────────┐
 │   DATABASE LAYER         │  │   STORAGE LAYER          │
 │  ┌────────────────────┐  │  │  ┌────────────────────┐  │
-│  │  PostgreSQL        │  │  │  │  Cloudinary /      │  │
-│  │  (Supabase)        │  │  │  │  Cloudflare R2     │  │
+│  │  PostgreSQL 16     │  │  │  │  Cloudinary /      │  │
+│  │  (Neon.tech)       │  │  │  │  Cloudflare R2     │  │
 │  │  - User data       │  │  │  │  - Original images │  │
 │  │  - Photo metadata  │  │  │  │  - Thumbnails      │  │
 │  │  - Albums          │  │  │  │  - Optimized files │  │
@@ -136,7 +136,8 @@ Build a feature-rich, scalable photo management platform using free/low-cost tec
 ### 4.3 Database
 | Option | Storage | Cost | Limits | Decision |
 |--------|---------|------|--------|----------|
-| **Supabase** | PostgreSQL | Free | 500MB DB, 1GB bandwidth | ✅ **RECOMMENDED** - Generous free tier, auth built-in |
+| **Neon.tech** | PostgreSQL 16 | Free | 512MB DB, 191.9 compute hours/month | ✅ **RECOMMENDED** - Serverless, auto-suspend, instant branching |
+| **Supabase** | PostgreSQL | Free | 500MB DB, 1GB bandwidth | Good alternative with auth built-in |
 | **PlanetScale** | MySQL | Free | 5GB storage | Good alternative |
 | **MongoDB Atlas** | NoSQL | Free | 512MB storage | Smaller limits |
 

@@ -42,7 +42,7 @@ services:
       - key: DEFAULT_STORAGE_LIMIT
         value: 5368709120
 
-# Optional: Add PostgreSQL database (not needed if using Supabase)
+# Optional: Add PostgreSQL database (not needed if using Neon.tech)
 # databases:
 #   - name: photo-memories-db
 #     databaseName: photo_memories

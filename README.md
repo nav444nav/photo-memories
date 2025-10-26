@@ -39,7 +39,7 @@ A modern, cloud-based photo management application inspired by Google Photos, Fl
 - Prisma ORM
 
 ### Infrastructure
-- **Database**: PostgreSQL (Supabase) - Free 500MB
+- **Database**: PostgreSQL (Neon.tech) - Free 512MB
 - **Storage**: Cloudinary - Free 25GB
 - **Hosting**: Vercel (frontend) + Render (backend)
 - **Cost**: $0/month for MVP
@@ -80,7 +80,7 @@ photo-memories/
 ### Prerequisites
 - Node.js 18+ and npm
 - Git
-- Supabase account (free)
+- Neon.tech account (free)
 - Cloudinary account (free)
 
 ### Setup Instructions
@@ -91,10 +91,10 @@ git clone <repository-url>
 cd photo-memories
 ```
 
-2. **Setup Supabase**
-   - Go to [supabase.com](https://supabase.com)
+2. **Setup Neon.tech**
+   - Go to [neon.tech](https://neon.tech)
    - Create new project
-   - Copy database URL and anon key
+   - Copy database connection string
 
 3. **Setup Cloudinary**
    - Go to [cloudinary.com](https://cloudinary.com)
@@ -193,7 +193,7 @@ React SPA (Vercel)
     ↓ REST API
 Express Backend (Render)
     ↓                    ↓
-PostgreSQL (Supabase)   Cloudinary (Images)
+PostgreSQL (Neon.tech)  Cloudinary (Images)
 ```
 
 ### Data Flow
@@ -316,17 +316,17 @@ npm run test:e2e
 
 ### Free Tier (0-100 users)
 - Cloudinary: 25GB storage + 25GB bandwidth
-- Supabase: 500MB database + 1GB bandwidth
+- Neon.tech: 512MB database + generous compute hours
 - Vercel: 100GB bandwidth
 - Render: 750 hours/month
 - **Total: $0/month**
 
 ### At Scale (1000 users)
 - Cloudinary: $99/month
-- Supabase: $25/month
+- Neon.tech: $19/month (Launch plan)
 - Render: $7/month (always-on)
 - Vercel: Still free
-- **Total: $131/month**
+- **Total: $125/month**
 
 ## License
 

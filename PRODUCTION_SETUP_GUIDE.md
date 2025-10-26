@@ -1,7 +1,7 @@
 # Production Setup Guide - Free Tier Deployment
 
 This guide will help you deploy Photo Memories to production using 100% free services:
-- **Supabase** - PostgreSQL database (500MB, 2GB bandwidth/month)
+- **Neon.tech** - Serverless PostgreSQL database (512MB, generous compute hours)
 - **Render** - Backend API hosting (750 hours/month)
 - **Vercel** - Frontend hosting (100GB bandwidth/month)
 
@@ -11,7 +11,7 @@ This guide will help you deploy Photo Memories to production using 100% free ser
 
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   Vercel    │ ───> │   Render    │ ───> │  Supabase   │
+│   Vercel    │ ───> │   Render    │ ───> │  Neon.tech  │
 │  (Frontend) │      │  (Backend)  │      │ (Database)  │
 └─────────────┘      └─────────────┘      └─────────────┘
 ```
@@ -24,38 +24,37 @@ This guide will help you deploy Photo Memories to production using 100% free ser
 
 ---
 
-## Part 1: Supabase Database Setup (15 minutes)
+## Part 1: Neon.tech Database Setup (10 minutes)
 
-### Step 1: Create Supabase Account
+### Step 1: Create Neon.tech Account
 
-1. Go to [https://supabase.com](https://supabase.com)
-2. Click "Start your project"
+1. Go to [https://neon.tech](https://neon.tech)
+2. Click "Sign Up" or "Get Started"
 3. Sign up with GitHub (recommended) or email
 4. Verify your email if needed
 
 ### Step 2: Create New Project
 
-1. Click "New Project"
+1. Click "New Project" or "Create Project"
 2. Fill in details:
-   - **Name**: `photo-memories-db` (or your choice)
-   - **Database Password**: Generate a strong password (SAVE THIS!)
-   - **Region**: Choose closest to your users
-   - **Pricing Plan**: Free
-3. Click "Create new project"
-4. Wait 2-3 minutes for project to initialize
+   - **Project Name**: `photo-memories` (or your choice)
+   - **PostgreSQL Version**: 16 (recommended, latest stable)
+   - **Region**: Choose closest to your users (e.g., US East, EU West)
+3. Click "Create Project"
+4. Project is created instantly (no waiting!)
 
 ### Step 3: Get Database Connection String
 
-1. In your Supabase project, click "Project Settings" (gear icon)
-2. Click "Database" in the left sidebar
-3. Scroll to "Connection string" section
-4. Click "URI" tab
-5. Copy the connection string (looks like):
+1. In your Neon dashboard, you'll see the connection details
+2. Click "Connection Details" or expand the connection string section
+3. Select "Prisma" from the connection type dropdown
+4. Copy the connection string (looks like):
    ```
-   postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+   postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require
    ```
-6. **IMPORTANT**: Replace `[YOUR-PASSWORD]` with the password from Step 2
-7. Save this - you'll need it for backend deployment
+5. The password is auto-generated and included in the string
+6. **IMPORTANT**: Save this connection string - you'll need it for backend deployment
+7. Note: Neon auto-suspends after inactivity to save resources (resumes in ~300ms on first query)
 
 ### Step 4: Run Database Migrations
 
@@ -67,30 +66,29 @@ On your local machine:
 # Navigate to backend directory
 cd backend
 
-# Create a new .env.production file
+# Create a new .env.production file with your Neon connection string
 cat > .env.production << 'EOF'
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+DATABASE_URL="postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require"
 EOF
 
-# Replace [YOUR-PASSWORD] and [PROJECT-REF] with your actual values
-# Edit the file and update the DATABASE_URL
+# Edit the file and paste your actual Neon connection string
+# Or just set it directly:
+# echo 'DATABASE_URL="your-neon-connection-string-here"' > .env.production
 
-# Run migrations against Supabase
+# Run migrations against Neon
 DATABASE_URL=$(cat .env.production | grep DATABASE_URL | cut -d= -f2 | tr -d '"') npx prisma migrate deploy
 ```
 
-**Option B: Using SQL Directly**
+**Option B: Using Prisma db push (Faster for initial setup)**
 
-1. In Supabase dashboard, click "SQL Editor" in left sidebar
-2. Click "New query"
-3. Copy the contents of `backend/prisma/manual_schema_postgres.sql` (we'll create this)
-4. Paste into SQL editor
-5. Click "Run" or press Cmd/Ctrl + Enter
-6. Verify tables were created in "Table Editor"
+```bash
+cd backend
+DATABASE_URL="your-neon-connection-string" npx prisma db push
+```
 
 ### Step 5: Verify Database Setup
 
-1. Click "Table Editor" in Supabase sidebar
+1. In Neon dashboard, click "Tables" in the left sidebar
 2. You should see 6 tables:
    - users
    - photos
@@ -99,8 +97,12 @@ DATABASE_URL=$(cat .env.production | grep DATABASE_URL | cut -d= -f2 | tr -d '"'
    - tags
    - photo_tags
 3. Click on "users" table - should be empty but have correct columns
+4. Or use Prisma Studio locally:
+   ```bash
+   DATABASE_URL="your-neon-connection-string" npx prisma studio
+   ```
 
-✅ **Supabase database is ready!**
+✅ **Neon.tech database is ready!**
 
 ---
 
@@ -158,12 +160,15 @@ ls dist/
 5. Click "Add Environment Variable" and add these:
 
 ```
-DATABASE_URL = postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+DATABASE_URL = postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require
 JWT_SECRET = [Generate a random 64-character string]
 JWT_EXPIRES_IN = 7d
 NODE_ENV = production
 PORT = 10000
 FRONTEND_URL = https://photo-memories.vercel.app
+CLOUDINARY_CLOUD_NAME = your-cloud-name
+CLOUDINARY_API_KEY = your-api-key
+CLOUDINARY_API_SECRET = your-api-secret
 ```
 
 **How to generate JWT_SECRET:**
@@ -273,8 +278,8 @@ VITE_APP_NAME = Photo Memories
 
 ### Step 3: Verify Database
 
-1. Go to Supabase dashboard
-2. Click "Table Editor"
+1. Go to Neon.tech dashboard
+2. Click "Tables" in sidebar
 3. Click "users" table
 4. You should see your newly created user!
 
@@ -349,10 +354,10 @@ VITE_API_URL = https://api.yourdomain.com/api
 - Try manual build locally: `npm run build`
 
 **Database connection fails:**
-- Verify DATABASE_URL is correct
-- Check Supabase project is active
-- Ensure password in connection string is correct
-- Check Supabase logs in "Database" → "Logs"
+- Verify DATABASE_URL is correct (must include `?sslmode=require`)
+- Check Neon project is active (not suspended)
+- Ensure connection string has the correct format
+- Check Neon console for connection logs and metrics
 
 **API returns 500 errors:**
 - Check Render logs: Service → "Logs" tab
@@ -389,14 +394,15 @@ VITE_API_URL = https://api.yourdomain.com/api
 
 **Tables don't exist:**
 - Run migrations manually using Prisma
-- Or run the SQL script directly in Supabase SQL Editor
-- Check Supabase "Table Editor" to confirm tables
+- Use `npx prisma db push` for quick setup
+- Check Neon "Tables" tab to confirm tables exist
 
-**Can't connect to Supabase:**
-- Verify project is active (not paused)
-- Check connection string format
+**Can't connect to Neon:**
+- Verify project is active (may auto-suspend after inactivity)
+- Check connection string format includes `?sslmode=require`
 - Ensure password is URL-encoded if it contains special chars
 - Try connecting with Prisma Studio locally
+- First query after suspension takes ~300ms (cold start)
 
 ---
 
@@ -416,12 +422,14 @@ VITE_API_URL = https://api.yourdomain.com/api
 - **Deployments**: Every git push creates preview deployment
 - **Production**: Assign deployment to production domain
 
-### Supabase (Database)
+### Neon.tech (Database)
 
-- **Usage**: Project → "Settings" → "Usage" (check storage, bandwidth)
-- **Logs**: "Database" → "Logs" (query logs, errors)
-- **Backups**: Free tier has daily backups (7 day retention)
-- **Studio**: Visual database editor for managing data
+- **Usage**: Project Dashboard → "Usage" (check storage, compute hours)
+- **Monitoring**: Real-time metrics for connections, queries, and latency
+- **Branches**: Create development branches for testing (instant, copy-on-write)
+- **Backups**: Point-in-time restore available (7-day history on free tier)
+- **Autoscaling**: Automatically scales compute based on load
+- **Auto-suspend**: Suspends after 5 minutes of inactivity (resumes in ~300ms)
 
 ---
 
@@ -429,12 +437,13 @@ VITE_API_URL = https://api.yourdomain.com/api
 
 ### Free Tier Limits
 
-**Supabase:**
-- ✅ 500 MB database storage
-- ✅ 1 GB file storage
-- ✅ 2 GB bandwidth/month
-- ✅ 50,000 monthly active users
-- ⚠️ Auto-pause after 1 week inactivity
+**Neon.tech:**
+- ✅ 512 MB database storage
+- ✅ 191.9 compute hours/month (enough for always-on with auto-suspend)
+- ✅ 10 branches (for development/testing)
+- ✅ Point-in-time restore (7 days)
+- ✅ Autoscaling and auto-suspend
+- ⚠️ Auto-suspends after 5 min inactivity (fast resume)
 
 **Render:**
 - ✅ 750 hours/month (enough for 1 service always on)
@@ -452,11 +461,12 @@ VITE_API_URL = https://api.yourdomain.com/api
 
 ### When to Upgrade
 
-**Supabase** ($25/month):
-- When you exceed 500 MB database
-- Need more than 2 GB bandwidth
-- Want daily backups with 30 day retention
-- Need point-in-time recovery
+**Neon.tech** ($19/month Launch plan):
+- When you exceed 512 MB database storage
+- Need more compute hours (always-on without auto-suspend)
+- Want unlimited branches
+- Need longer point-in-time restore (30 days)
+- Require read replicas for better performance
 
 **Render** ($7/month):
 - Don't want service to sleep
@@ -477,14 +487,14 @@ Before going live:
 
 - [ ] Change all default passwords
 - [ ] Use strong JWT_SECRET (64+ characters)
-- [ ] Enable Supabase Row Level Security (RLS)
+- [ ] Review Neon database access settings
 - [ ] Add rate limiting to backend
 - [ ] Set up monitoring and alerts
 - [ ] Configure CORS properly (don't use *)
 - [ ] Use environment variables (never commit secrets)
 - [ ] Enable HTTPS only (auto on Render/Vercel)
 - [ ] Set secure cookie policies
-- [ ] Review Supabase auth settings
+- [ ] Enable SSL mode for database connections (sslmode=require)
 
 ---
 
@@ -554,7 +564,7 @@ npx prisma migrate dev     # Development
 
 ### Support Resources
 
-- **Supabase Docs**: https://supabase.com/docs
+- **Neon.tech Docs**: https://neon.tech/docs
 - **Render Docs**: https://render.com/docs
 - **Vercel Docs**: https://vercel.com/docs
 - **Prisma Docs**: https://www.prisma.io/docs

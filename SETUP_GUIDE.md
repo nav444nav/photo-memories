@@ -6,7 +6,7 @@ Step-by-step guide to set up and run Photo Memories on your local machine or pro
 
 - Node.js 18+ and npm
 - Git
-- PostgreSQL 14+ OR Supabase account (recommended)
+- PostgreSQL 14+ OR Neon.tech account (recommended)
 - Cloudinary account (free tier) for image storage
 
 ---
@@ -72,29 +72,29 @@ npm run dev
 
 ---
 
-## Option 2: Production Setup with Supabase (Recommended)
+## Option 2: Production Setup with Neon.tech (Recommended)
 
-### 1. Create Supabase Project
+### 1. Create Neon.tech Project
 
-1. Go to [supabase.com](https://supabase.com)
-2. Create free account
+1. Go to [neon.tech](https://neon.tech)
+2. Create free account (sign up with GitHub recommended)
 3. Click "New Project"
 4. Fill in details:
    - **Name**: photo-memories
-   - **Database Password**: (choose strong password)
+   - **PostgreSQL Version**: 16 (latest)
    - **Region**: Choose closest to you
-5. Wait for project to be created (~2 minutes)
+5. Project is created instantly!
 
 ### 2. Get Database Connection String
 
-1. In Supabase dashboard, go to **Settings** → **Database**
-2. Scroll to "Connection string" → "URI"
+1. In Neon dashboard, you'll see "Connection Details"
+2. Select "Prisma" from the connection type dropdown
 3. Copy the connection string
 4. It looks like:
    ```
-   postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+   postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require
    ```
-5. Replace `[YOUR-PASSWORD]` with your actual password
+5. The password is already included in the string
 
 ### 3. Configure Backend
 
@@ -105,7 +105,7 @@ cd backend
 nano .env
 
 # Update DATABASE_URL:
-DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+DATABASE_URL="postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require"
 
 # Save and exit
 ```
@@ -140,9 +140,10 @@ npm run db:push
 
 ### 6. Verify Database
 
-1. Go to Supabase dashboard → **Table Editor**
+1. Go to Neon dashboard → **Tables**
 2. You should see tables: users, photos, albums, tags, etc.
 3. Check that indexes are created
+4. Or use Prisma Studio: `npm run db:studio`
 
 ### 7. Start Application
 
