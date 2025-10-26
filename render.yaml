@@ -8,7 +8,7 @@ services:
     runtime: node
     region: oregon  # Change to: oregon, frankfurt, singapore, ohio
     plan: free
-    branch: main
+    branch: claude/add-neon-tech-011CUV3od9DAWiuWeFkopReA
     rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm start
@@ -42,7 +42,7 @@ services:
       - key: DEFAULT_STORAGE_LIMIT
         value: 5368709120
 
-# Optional: Add PostgreSQL database (not needed if using Supabase)
+# Optional: Add PostgreSQL database (not needed if using Neon.tech)
 # databases:
 #   - name: photo-memories-db
 #     databaseName: photo_memories

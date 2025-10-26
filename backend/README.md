@@ -54,7 +54,7 @@ backend/
 ### Prerequisites
 
 - Node.js 18+ and npm
-- PostgreSQL 14+ (or Supabase account)
+- PostgreSQL 14+ (or Neon.tech account)
 
 ### Installation
 
@@ -87,13 +87,13 @@ npm run db:migrate
 npm run db:seed
 ```
 
-**Option 2: Supabase (Recommended)**
+**Option 2: Neon.tech (Recommended)**
 
-1. Create project at [supabase.com](https://supabase.com)
-2. Get connection string from Settings → Database
+1. Create project at [neon.tech](https://neon.tech)
+2. Get connection string from Dashboard → Connection Details
 3. Update `DATABASE_URL` in `.env`:
 ```
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+DATABASE_URL="postgresql://[user]:[password]@[endpoint].neon.tech/neondb?sslmode=require"
 ```
 4. Run migrations:
 ```bash

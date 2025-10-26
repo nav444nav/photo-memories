@@ -62,25 +62,27 @@
 
 ---
 
-### 4. PostgreSQL via Supabase (Database)
+### 4. PostgreSQL via Neon.tech (Database)
 
-**Decision**: Use Supabase (managed PostgreSQL)
+**Decision**: Use Neon.tech (serverless PostgreSQL)
 
 **Reasoning**:
-- Free tier: 500MB database + 1GB bandwidth
-- Built-in authentication APIs
-- Real-time subscriptions (bonus feature)
-- Row-level security built-in
-- REST API auto-generated
+- Free tier: 512MB database + generous compute hours
+- Serverless architecture with autoscaling
+- Instant branching for development/testing
+- Auto-suspend during inactivity (saves resources)
 - PostgreSQL is battle-tested, ACID compliant
+- Simple connection pooling built-in
+- Fast cold starts (~300ms)
 
 **Alternatives Considered**:
+- Supabase: Good but heavier with extra features we don't need
 - MongoDB Atlas: Only 512MB free, NoSQL not needed
 - PlanetScale: MySQL, more complex branching
 - Firebase: NoSQL, expensive at scale
 
 **Cost**: $0/month (free tier)
-**Upgrade**: $25/month if needed
+**Upgrade**: $19/month (Launch plan) if needed
 
 ---
 

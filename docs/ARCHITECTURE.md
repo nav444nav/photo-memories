@@ -80,16 +80,16 @@
         ▼                     ▼    ▼                      ▼
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │   DATABASE       │  │  IMAGE STORAGE   │  │  IMAGE PROCESSOR │
-│   (Supabase)     │  │  (Cloudinary)    │  │  (Sharp)         │
+│   (Neon.tech)    │  │  (Cloudinary)    │  │  (Sharp)         │
 │                  │  │                  │  │                  │
-│  PostgreSQL      │  │  Object Storage  │  │  - Resize        │
+│  PostgreSQL 16   │  │  Object Storage  │  │  - Resize        │
 │  - users         │  │  + CDN           │  │  - Compress      │
 │  - photos        │  │  + Transform     │  │  - Format conv   │
 │  - albums        │  │  + Optimize      │  │  - EXIF extract  │
 │  - tags          │  │                  │  │                  │
 │                  │  │  Auto WebP       │  │  In-memory proc  │
-│  Row-level       │  │  Global CDN      │  │  Fast (50ms)     │
-│  security        │  │  URL transforms  │  │                  │
+│  Serverless      │  │  Global CDN      │  │  Fast (50ms)     │
+│  Auto-suspend    │  │  URL transforms  │  │                  │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
