@@ -27,19 +27,19 @@ export interface RegisterCredentials extends LoginCredentials {
 // Photo types
 export interface Photo {
   id: string
-  user_id: string
+  userId: string
   filename: string
-  original_url: string
-  thumbnail_url: string
-  medium_url?: string
-  file_size: number
+  originalUrl: string
+  thumbnailUrl: string
+  mediumUrl?: string
+  fileSize: number
   width?: number
   height?: number
   format?: string
-  taken_at?: string
-  uploaded_at: string
-  is_favorite: boolean
-  is_archived: boolean
+  takenAt?: string
+  uploadedAt: string
+  isFavorite: boolean
+  isArchived: boolean
   metadata?: PhotoMetadata
   tags?: Tag[]
   albums?: Album[]
