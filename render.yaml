@@ -8,7 +8,7 @@ services:
     runtime: node
     region: oregon  # Change to: oregon, frankfurt, singapore, ohio
     plan: free
-    branch: main
+    branch: claude/add-neon-tech-011CUV3od9DAWiuWeFkopReA
     rootDir: backend
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm start
