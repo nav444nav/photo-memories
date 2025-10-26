@@ -28,9 +28,31 @@ export default function GalleryPage() {
     },
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (photoId: string) => photoService.deletePhoto(photoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos'] })
+      setUploadProgress('Photo deleted successfully')
+      setTimeout(() => setUploadProgress(''), 3000)
+    },
+    onError: (error: any) => {
+      setUploadProgress(`Delete failed: ${error.message}`)
+      setTimeout(() => setUploadProgress(''), 5000)
+    },
+  })
+
   const handlePhotoClick = (photo: Photo) => {
     console.log('Photo clicked:', photo)
     // TODO: Open photo viewer/lightbox
+  }
+
+  const handleDeletePhoto = (photo: Photo) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${photo.filename}"? This action cannot be undone.`
+    )
+    if (confirmed) {
+      deleteMutation.mutate(photo.id)
+    }
   }
 
   const handleUploadClick = () => {
@@ -97,7 +119,13 @@ export default function GalleryPage() {
       {isLoading && <LoadingSkeleton />}
 
       {/* Photos grid */}
-      {data && <PhotoGrid photos={data.photos} onPhotoClick={handlePhotoClick} />}
+      {data && (
+        <PhotoGrid
+          photos={data.photos}
+          onPhotoClick={handlePhotoClick}
+          onDeletePhoto={handleDeletePhoto}
+        />
+      )}
     </div>
   )
 }
