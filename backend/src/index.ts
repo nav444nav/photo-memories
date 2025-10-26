@@ -12,6 +12,12 @@ import prisma from './utils/prisma'
 // Load environment variables
 dotenv.config()
 
+// Add BigInt serialization support for JSON
+// @ts-ignore
+BigInt.prototype.toJSON = function() {
+  return Number(this)
+}
+
 const app: Application = express()
 const PORT = process.env.PORT || 3000
 
